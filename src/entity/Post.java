@@ -4,10 +4,13 @@
  */
 package entity;
 
+import java.awt.Image;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -60,6 +63,11 @@ public class Post implements Serializable {
     @Size(max = 255)
     @Column(name = "text")
     private String text;
+    
+    @Column(name = "formattedDate")
+    private String formattedDate;
+    @Column(name = "image")
+    private String image;
 //    @Basic(optional = false)
 //    @NotNull
 //    @Column(name = "posterId")
@@ -68,10 +76,44 @@ public class Post implements Serializable {
     @NotNull
     @Column(name = "ownerId")
     private int ownerId;
-    @Column(name = "popularity")
-    private Integer popularity;
+    @Column(name = "like")
+    private Integer likes;
+    
+    // three custom stuff.
+    @Column(name = "file")
+    private CFile file;
+    @Column(name = "person")
+    private Person person;
+    @Column (name = "likers")
+    private List<Integer> likers = new ArrayList<>();
+    
+    
+   
+    public CFile getFile() {
+		return file;
+	}
 
-    public Post() {
+	public void setFile(CFile file) {
+		this.file = file;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public List<Integer> getLikers() {
+		return likers;
+	}
+
+	public void setLikers(List<Integer> likers) {
+		this.likers = likers;
+	}
+
+	public Post() {
     }
 
     public Post(Integer id) {
@@ -132,12 +174,12 @@ public class Post implements Serializable {
         this.ownerId = ownerId;
     }
 
-    public Integer getPopularity() {
-        return popularity;
+    public Integer getLikes() {
+        return likes;
     }
 
-    public void setPopularity(Integer popularity) {
-        this.popularity = popularity;
+    public void setLikes(Integer Likes) {
+        this.likes = Likes;
     }
 
     @Override
@@ -190,13 +232,13 @@ public class Post implements Serializable {
 
 
     @OneToMany (mappedBy="post", cascade=CascadeType.PERSIST)
-    private Set<Video> videos = new HashSet<Video>();
+    private String videos ;
 
-    public Set<Video> getVideos() {
+    public String getVideos() {
 	  return videos;
     }
 
-    public void setVideos(Set<Video> videos) {
+    public void setVideos(String videos) {
 	   this.videos = videos;
     }
 
@@ -217,5 +259,18 @@ public class Post implements Serializable {
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 	return formatter.format(date);
     }
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public void setFormattedDate(String formattedDate) {
+		this.formattedDate = formattedDate;
+	}
+    
     
 }

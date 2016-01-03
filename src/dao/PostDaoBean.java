@@ -51,7 +51,7 @@ public class PostDaoBean extends GenericDaoBean<Post, Integer> implements PostDa
         post.setPoster(personDao.findById(posterId));
         post.setOwnerId(ownerId);
         post.setDate(new Date());
-        post.setPopularity(0);
+        post.setLikes(0);
         //em.persist(post);
         
         //post = findByAttributes(post.getTitle(), post.getText(), post.getOwnerId(), post.getDate());
@@ -72,7 +72,7 @@ public class PostDaoBean extends GenericDaoBean<Post, Integer> implements PostDa
 	    videoEntity.setLink("http://youtube.com/v/" + video);
 	    videoEntity.setPost(post);
 	    videos.add(videoEntity);
-	    post.setVideos(videos);
+	    //post.setVideos(videos);
         }
         if(link != null && !link.equals("")) {
             // linkDao.createLink(link, post.getId());

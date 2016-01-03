@@ -4,12 +4,34 @@
     <title>Login</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
-  <body>
+  <script>
+	function clearForms() {
+		var i;
+		for (i = 0; (i < document.forms.length); i++) {
+			document.forms[i].reset();
+		}
+	}
+	function validateForm() {
+		var x = document.forms["myForm"]["email"].value;
+		if (x == null || x == "") {
+			alert("Username must be filled out");
+			document.getElementById('email').focus();
+			return false;
+		}
+		var y = document.forms["myForm"]["password"].value;
+		if (y == null || y == "") {
+			alert("password must be filled out");
+			document.getElementById('password').focus();
+			return false;
+		}
+	}
+</script>
+  <body onLoad="clearForms()" onunload="clearForms()">
     <jsp:include page="header.jsp"/>
     <%= (request.getAttribute("error") == null) ? "" : request.getAttribute("error") %>
     <h2>Login</h2> 
-            
-    <form action="login" method="post">
+
+    <form action="login" method="post" onsubmit="return validateForm()">
       <table cellspacing="2" cellpadding="0" border="0">
         <tbody>
           <tr>
@@ -29,5 +51,4 @@
     </form>
   </body>
 </html>
-
 

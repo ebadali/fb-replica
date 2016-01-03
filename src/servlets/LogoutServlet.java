@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import container.Data;
+
 /**
  *
  * @author milandobrota
@@ -30,8 +32,9 @@ public class LogoutServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
         session.removeAttribute("personId");
+        session.removeAttribute(Data.COOKIE_USERID);
         response.sendRedirect("login");
         PrintWriter out = response.getWriter();
         try {

@@ -16,10 +16,10 @@
     <c:forEach var="person" items="${people}">
 	    <tr>
 		    <td>
-			    <a href="profile?personId=${person.id}"><img src="${person.picture}" height="64"/></a>
+			    <a href="profile?personId=${person.firstName}"><img src="${person.lastName}" height="100" width="100"/></a>
 		    </td>
 		    <td>
-			    <a href="profile?personId=${person.id}">${person.firstName} ${person.lastName}</a><br />
+			    <a href="profile?personId=${person.firstName}">${person.firstName} ${person.lastName}</a><br />
 		    </td>
 	    </tr>
     </c:forEach>

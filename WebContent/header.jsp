@@ -16,6 +16,9 @@
     <a href="logout">Logout</a>
 <% } else { %>
     <a href="login">Login</a> |
-    <a href="signup.jsp">Sign up</a>
+    <a href="signup.jsp">Sign up</a>|
+    <a href="test">Test</a> |
+    <a href="wall">Wall</a>
+    
 <% } %>
 </div>

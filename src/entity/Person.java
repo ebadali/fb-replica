@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author milandobrota
  */
 @Entity
-@Table(name = "people")
+@Table(name = "Person")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Person.findAll", query = "SELECT p FROM Person p"),
@@ -135,6 +135,9 @@ public class Person implements Serializable {
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = new Date(dateOfBirth);
     }
 
     public Boolean getSex() {

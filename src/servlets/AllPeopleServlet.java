@@ -5,6 +5,7 @@
 package servlets;
 
 import dao.PersonDao;
+import dao.UserDAO;
 import entity.Person;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -45,15 +46,19 @@ public class AllPeopleServlet extends HttpServlet {
 			boolean order = (orderParam == null || !orderParam.equals("DESC"));
 			String orderBy = request.getParameter("orderBy");
 			if(orderBy != null && orderBy.equals("place")) {
-				people = personDao.findAllSortedByPlace(order);
+				people = UserDAO._instance.findAllSortedByPlace(order);
 			} else if(orderBy != null && orderBy.equals("dateOfBirth")) {
-				people = personDao.findAllSortedByDateOfBirth(order);
+				people = UserDAO._instance.findAllSortedByDateOfBirth(order);
 			} else {
-				people = personDao.findAllSortedByName(order);
+				people = UserDAO._instance.findAllSortedByName(order);
 			}
+			
 			request.setAttribute("people", people);
 			ctx.getRequestDispatcher("/everybody.jsp").forward(request, response); 	
 			return;
+			
+
+					
 
 			/* TODO output your page here
 			out.println("<html>");
