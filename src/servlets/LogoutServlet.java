@@ -32,7 +32,15 @@ public class LogoutServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
         HttpSession session = request.getSession(false);
+		Integer personId;// = (Integer) session.getAttribute("personId");
+		if (session == null || session.getAttribute("personId") == null) {
+			request.setAttribute("error", "You are Not Logged In");
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+			return;
+
+		}
         session.removeAttribute("personId");
         session.removeAttribute(Data.COOKIE_USERID);
         response.sendRedirect("login");

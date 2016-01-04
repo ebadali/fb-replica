@@ -66,7 +66,7 @@
 				<script language="javascript">
 					function MyFunction(id) {
 						
-						alert("Liked successful "+ id);
+						//alert("Liked successful "+ id);
 					}
 				</script>
 				<%

@@ -5,6 +5,8 @@
 package servlets;
 
 import dao.FriendRequestDao;
+import dao.UserDAO;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.ejb.EJB;
@@ -35,12 +37,21 @@ public class AcceptFriendRequestServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        HttpSession session = request.getSession(true);
-        Integer personId = (Integer)session.getAttribute("personId");
+        HttpSession session = request.getSession(false);
+		Integer personId;// = (Integer) session.getAttribute("personId");
+		if (session == null || session.getAttribute("personId") == null) {
+			request.setAttribute("error", "You are Not Logged In");
+			request.getRequestDispatcher("index.jsp").forward(request, response);
+			return;
+
+		}
+        
         PrintWriter out = response.getWriter();
         try {
-            Integer sourceId = Integer.parseInt(request.getParameter("sourceId")); 
-            if(friendRequestDao.acceptFriendRequest(sourceId, personId)){
+        	personId = (Integer)session.getAttribute("personId");
+            Integer friendId = Integer.parseInt(request.getParameter("friendId")); 
+            
+            if(UserDAO._instance.acceptFriendRequest(friendId, personId)){
                 out.println("accepted");
             }else {
                 out.println("failed");

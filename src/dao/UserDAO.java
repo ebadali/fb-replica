@@ -85,55 +85,73 @@ public class UserDAO {
 			if (this.user != null)
 				return succesFlag;
 
-			PreparedStatement pstmt = this.currentCon
-					.prepareStatement("insert into Person values(?,?,?,?,?,?,?,?,?,?,?,?,?)");
-			// String inserQuery = " Insert into Person (firstname , sex , email
-			// ,
-			// password ) values
-			// ('aaa' , 'male' , 'aaa@sadas.cm' , 3216549987 )
+			// Create FriendList
 
-			int i = 2;
-			// pstmt.setInt(i++, 56);
-			pstmt.setString(i++, firstName);
-			pstmt.setString(i++, lastName);
-			pstmt.setInt(i++, sex ? 1 : 0);
-			pstmt.setString(i++, email);
-			pstmt.setString(i++, "password"); // password
-			pstmt.setString(i++, dateOfBirth.toString());
-			pstmt.setString(i++, place);
-			pstmt.setString(i++, website);
-			pstmt.setString(i++, education);
-			pstmt.setString(i++, occupation);
-			pstmt.setString(i++, employment);
-			pstmt.setString(i++, picture);
-			int a = pstmt.executeUpdate();
-			if (a > 0) {
+			int FriendList_id = -1;
+			if (stmt.executeUpdate("insert into FriendList values (null,0)") > 0) {
+				// a. Get Likes_id
+				ResultSet rs11 = stmt
+						.executeQuery("SELECT * FROM FriendList ORDER BY FriendList.friendlist_id DESC LIMIT 1;");
+				if (rs11.next()) {
+					FriendList_id = rs11.getInt("friendlist_id");
+					// We are good to go
 
-				System.out.println("Values Are Inserted");
-				if (picture == null)
-					picture = "person.gif";
-				rs = stmt.executeQuery("select Person.person_id from Person " + "where Person.firstname='" + firstName
-						+ "' AND Person.lastname='" + lastName + "' ");
-				if (rs.next()) {
-					int Id = rs.getInt("person_id");
+					PreparedStatement pstmt = this.currentCon
+							.prepareStatement("insert into Person values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+					// String inserQuery = " Insert into Person (firstname , sex
+					// , email
+					// ,
+					// password ) values
+					// ('aaa' , 'male' , 'aaa@sadas.cm' , 3216549987 )
 
-					Person person = new Person();
-					person.setId(Id);
-					person.setFirstName(firstName);
-					person.setLastName(lastName);
-					person.setDateOfBirth(dateOfBirth);
-					person.setSex(sex);
-					person.setEmail(email);
-					person.setPlace(place);
-					person.setWebsite(website);
-					person.setEducation(education);
-					person.setOccupation(occupation);
-					person.setEmployment(employment);
-					person.setPicture(picture);
-					person.setPassword("password");
+					int i = 2;
+					// pstmt.setInt(i++, 56);
+					pstmt.setString(i++, firstName);
+					pstmt.setString(i++, lastName);
+					pstmt.setInt(i++, sex ? 1 : 0);
+					pstmt.setString(i++, email);
+					pstmt.setString(i++, "password"); // password
+					pstmt.setString(i++, dateOfBirth.toString());
+					pstmt.setString(i++, place);
+					pstmt.setString(i++, website);
+					pstmt.setString(i++, education);
+					pstmt.setString(i++, occupation);
+					pstmt.setString(i++, employment);
+					pstmt.setString(i++, picture);
+					pstmt.setInt(i++, FriendList_id);
 
-					this.user = person;
-					succesFlag = true;
+					int a = pstmt.executeUpdate();
+					if (a > 0) {
+
+						if (picture == null)
+							picture = "person.gif";
+						rs = stmt.executeQuery("select Person.person_id from Person " + "where Person.firstname='"
+								+ firstName + "' AND Person.lastname='" + lastName + "'  AND Person.email='" + email
+								+ "' ");
+						if (rs.next()) {
+							int Id = rs.getInt("person_id");
+
+							Person person = new Person();
+							person.setId(Id);
+							person.setFirstName(firstName);
+							person.setLastName(lastName);
+							person.setDateOfBirth(dateOfBirth);
+							person.setSex(sex);
+							person.setEmail(email);
+							person.setPlace(place);
+							person.setWebsite(website);
+							person.setEducation(education);
+							person.setOccupation(occupation);
+							person.setEmployment(employment);
+							person.setPicture(picture);
+							person.setPassword("password");
+							person.setFriendListId(FriendList_id);
+
+							this.user = person;
+							succesFlag = true;
+							System.out.println("Values Are Inserted");
+						}
+					}
 				}
 
 			} else {
@@ -147,6 +165,7 @@ public class UserDAO {
 		return succesFlag;
 
 	}
+
 	public UserBean login(UserBean bean) {
 
 		// preparing some objects for connection
@@ -222,22 +241,16 @@ public class UserDAO {
 
 	}
 
-	
-
 	public Person login(String email, String password) {
 
 		// preparing some objects for connection
 		boolean success = false;
-		if(this.user != null)
-		{
+		if (this.user != null) {
 			// Already Login.
-			return this.user; 
+			return this.user;
 		}
-		
 
 		String searchQuery = "select * from Person where email='" + email + "' AND password='" + password + "'";
-
-		
 
 		try {
 
@@ -251,9 +264,9 @@ public class UserDAO {
 
 			// if user exists set the isValid variable to true
 			else if (more) {
-				
+
 				// Create a Person Here.
-				
+
 				this.user = new Person();
 				this.user.setId(rs.getInt("person_id"));
 				this.user.setFirstName(rs.getString("firstname"));
@@ -268,17 +281,69 @@ public class UserDAO {
 				this.user.setEmployment(rs.getString("employment"));
 				this.user.setPicture(rs.getString("photo"));
 				this.user.setPassword(rs.getString("password"));
+				this.user.setFriendListId(rs.getInt("friend_list"));
 
-				success = true; 
+				success = true;
 			}
 		}
 
 		catch (Exception ex) {
-			
+
 			System.out.println("Log In failed: An Exception has occurred! " + ex);
-			success = false; 
+			success = false;
 		}
 		return this.user;
+
+	}
+
+	public Person GetPerson(int id) {
+
+		// preparing some objects for connection
+		boolean success = false;
+		Person somePerson = null;
+		String searchQuery = "select * from Person where person_id='" + id + "' ";
+
+		try {
+			Statement some = currentCon.createStatement();
+			ResultSet rss = some.executeQuery(searchQuery);
+			boolean more = rss.next();
+			// if user does not exist set the isValid variable to false
+			if (!more) {
+				System.out.println("Sorry, you are not a registered user! Please sign up first");
+				success = false;
+			}
+
+			// if user exists set the isValid variable to true
+			else if (more) {
+
+				// Create a Person Here.
+
+				somePerson = new Person();
+				somePerson.setId(rss.getInt("person_id"));
+				somePerson.setFirstName(rss.getString("firstname"));
+				somePerson.setLastName(rss.getString("lastname"));
+				somePerson.setDateOfBirth(rss.getString("dob"));
+				somePerson.setSex(rss.getInt("sex") == 1 ? true : false);
+				somePerson.setEmail(rss.getString("email"));
+				somePerson.setPlace(rss.getString("place"));
+				somePerson.setWebsite(rss.getString("website"));
+				somePerson.setEducation(rss.getString("education"));
+				somePerson.setOccupation(rss.getString("occupation"));
+				somePerson.setEmployment(rss.getString("employment"));
+				somePerson.setPicture(rss.getString("photo"));
+				somePerson.setPassword(rss.getString("password"));
+				somePerson.setFriendListId(rss.getInt("friend_list"));
+
+				success = true;
+			}
+		}
+
+		catch (Exception ex) {
+
+			System.out.println("Log In failed: An Exception has occurred! " + ex);
+			success = false;
+		}
+		return somePerson;
 
 	}
 
@@ -368,7 +433,7 @@ public class UserDAO {
 		return personArray;
 	}
 
-	public List<Person> findAllSortedByName(boolean order) {
+	public List<Person> findAllSortedByName(boolean order, int personId) {
 		// TODO Auto-generated method stub
 		List<Person> personArray = new ArrayList<Person>();
 		try {
@@ -376,35 +441,42 @@ public class UserDAO {
 			// rs = stmt.executeQuery("select * from Person");
 
 			String searchQuery = "select * from Person";
-			stmt = currentCon.createStatement();
-			rs = stmt.executeQuery(searchQuery);
-			while (rs.next()) {
-				Person person = new Person();
-				person.setFirstName(rs.getString("name"));
-				person.setLastName("not known yet");
-				person.setEmail(rs.getString("email"));
+			Statement currstmt = currentCon.createStatement();
+			ResultSet rss = currstmt.executeQuery(searchQuery);
+			while (rss.next()) {
+
+				Person somePerson = new Person();
+
+				somePerson.setId(rss.getInt("person_id"));
+				somePerson.setFirstName(rss.getString("firstname"));
+				somePerson.setLastName(rss.getString("lastname"));
+				somePerson.setDateOfBirth(rss.getString("dob"));
+				somePerson.setSex(rss.getInt("sex") == 1 ? true : false);
+				somePerson.setEmail(rss.getString("email"));
+				somePerson.setPlace(rss.getString("place"));
+				somePerson.setWebsite(rss.getString("website"));
+				somePerson.setEducation(rss.getString("education"));
+				somePerson.setOccupation(rss.getString("occupation"));
+				somePerson.setEmployment(rss.getString("employment"));
+				somePerson.setPicture(rss.getString("photo"));
+				somePerson.setPassword(rss.getString("password"));
+				somePerson.setFriendListId(rss.getInt("friend_list"));
 				// person.setSex( rs.getString("gender") );
-				personArray.add(person);
+				personArray.add(somePerson);
 			}
-			// boolean more = rs.next();
-			// // if user does not exist set the isValid variable to false
-			// if (!more) {
-			// System.out.println("Sorry, you are not a registered user! Please
-			// sign up first");
-			// return personArray;
-			// } else {
-			//
-			// while (rs.next()) {
-			// Person person = new Person();
-			// person.setFirstName(rs.getString("name"));
-			// person.setLastName("not known yet");
-			// person.setEmail(rs.getString("email"));
-			//
-			//
-			// // person.setSex( rs.getString("gender") );
-			// personArray.add(person);
-			// }
-			// }
+
+			List<Person> friendList = GetFriends(personId, Data.ALL);
+			// Cross checking and marking the friends in personArray
+			if (friendList != null && personArray != null && personArray.size() > 0) {
+				for (int i = 0; i < friendList.size(); i++) {
+					Person temp = friendList.get(i);
+					for (int j = 0; j < personArray.size(); j++) {
+						if (temp.getId().intValue() == personArray.get(j).getId().intValue())
+							personArray.get(j).setStatus(Data.FRIENDS);
+					}
+
+				}
+			}
 
 		} catch (Exception e) {
 			// handle exception here
@@ -531,6 +603,208 @@ public class UserDAO {
 		return this.listOfAllPosts;
 
 	}
+
+	public boolean CreateAPost(String title, String text, Integer personId, Integer ownerId, String pictureFilename,
+			String youtubeVideoId, String link) {
+
+		boolean successFlag = false;
+
+		try {
+			// This is a test
+			// 1. Create File
+			PreparedStatement pstmt = this.currentCon.prepareStatement("insert into File values(?,?,?,?)");
+
+			int i = 2;
+			pstmt.setString(i++, youtubeVideoId);
+			pstmt.setString(i++, text);
+			pstmt.setString(i++, pictureFilename);
+
+			int a = pstmt.executeUpdate();
+			if (a > 0) {
+
+				System.out.println("File has Created");
+
+				// a. Get File_id
+				rs = stmt.executeQuery("SELECT * FROM File ORDER BY file_id DESC LIMIT 1;");
+				if (rs.next()) {
+					int file_Id = rs.getInt("file_id");
+					String fileText = rs.getString("text"), video = rs.getString("video");
+
+					// Part one completed
+
+					// 2. Create Likes
+					int likeCreated = stmt.executeUpdate("insert into Likes values (null, 100);");
+					int likes_id = -1;
+					if (likeCreated > 0) {
+						// a. Get Likes_id
+						ResultSet rs1 = stmt.executeQuery("SELECT * FROM Likes ORDER BY likes_id DESC LIMIT 1;");
+						if (rs1.next()) {
+							likes_id = rs1.getInt("likes_id");
+							// We are good to go
+
+							PreparedStatement postCreaterStatment = this.currentCon
+									.prepareStatement("insert into Post values(?,?,?,?)");
+
+							int j = 2;
+							postCreaterStatment.setInt(j++, personId);
+							postCreaterStatment.setInt(j++, file_Id);
+							postCreaterStatment.setInt(j++, likes_id);
+
+							if (postCreaterStatment.executeUpdate() > 0) {
+
+								ResultSet rs2 = stmt.executeQuery("SELECT * FROM Post ORDER BY post_id DESC LIMIT 1;");
+								if (rs2.next()) {
+									Post post = new Post();
+									post.setId(rs2.getInt("post_id"));
+
+									post.setLikes(likes_id);
+									post.setPerson(this.user);
+									CFile file = new CFile();
+									file.setId(file_Id);
+									// file.setImage(rs.getString("image"));
+									file.setText(fileText);
+									file.setVideos(video);
+									file.setTitle(title);
+									file.setFormattedDate(file.getFormattedDate());
+
+									post.setFile(file);
+
+									// Adding it to the current user
+									this.listOfAllPosts.add(post);
+									successFlag = true;
+								}
+
+							}
+						}
+
+					}
+				}
+			}
+			// 2. Create Likes
+			// a. Get Likes_id
+			// 3. Create Post
+
+			// 1. Create File
+			// a. Get File_id
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			successFlag = false;
+		}
+
+		return successFlag;
+	}
+
+	public List<Person> GetFriends(int personID, int Filter) {
+		// TODO Auto-generated method stub
+
+		List<Person> friendList = new ArrayList<>();
+		String friendFinder = "select  (per.person_id), frnd.status " + " from Person p  " + "	join FriendList flist "
+				+ "        on flist.friendlist_id =  p.friend_list " + "	join Friends frnd  "
+				+ "		on frnd.friends_id = flist.friends_id " + "	join Person per  "
+				+ "		on per.person_id=frnd.person_id " + "	where p.person_id= " + personID + " ;";
+
+		try {
+
+			Statement curr = currentCon.createStatement();
+			ResultSet rsss = curr.executeQuery(friendFinder);
+			int someSize = rsss.getFetchSize();
+			// 1: Get All Post
+			while (rsss.next()) {
+				int friendID = rsss.getInt("person_id");
+				int status = rsss.getInt("status");
+				if (status == Filter || Filter == Data.ALL ) {
+					Person person = GetPerson(friendID);
+					person.setStatus(status);
+					friendList.add(person);
+				}
+
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return friendList;
+	}
+
+	public boolean sendFriendRequest(Integer friendId, Integer personId) {
+		// TODO Auto-generated method stub
+
+		boolean flagOfsuccess = false;
+		String selectSpecificPeople = " select   fList.friends_id " + "	from Person p " + " join FriendList fList "
+				+ " on fList.friendlist_id =  p.friend_list " + " where p.person_id = " + friendId;
+		try {
+
+			Statement curr = currentCon.createStatement();
+			ResultSet result = curr.executeQuery(selectSpecificPeople);
+			if (result.next()) {
+				int friendlist = result.getInt("friends_id");
+				String insertTheFriendRequest = " insert into Friends ( friends_id , status , person_id )  values ( "
+						+ friendlist + " , " + Data.PENDING + " , " + personId + " ) ";
+
+				int as = currentCon.createStatement().executeUpdate(insertTheFriendRequest);
+				if (as > 0)
+					flagOfsuccess = true;
+
+			}
+
+		} catch (Exception ex) {
+			flagOfsuccess = false;
+		}
+		return flagOfsuccess;
+	}
+
+	public boolean acceptFriendRequest(Integer friendId, Integer personId) {
+		// TODO Auto-generated method stub
+
+		String friendFinder = "UPDATE  Friends " + " SET status = " + Data.FRIENDS + " "
+				+ " WHERE  person_id = (select frnd.person_id from Person p " + "			join FriendList flist "
+				+ "				       on flist.friendlist_id =  p.friend_list " + "			join Friends frnd "
+				+ "						on frnd.friends_id = flist.friends_id 	" + "			join Person per  "
+				+ "					on per.person_id=frnd.person_id 	" + "	where  p.person_id = " + personId
+				+ "  AND per.person_id = " + friendId + "  AND  frnd.status == " + Data.PENDING + " )";
+
+		boolean flagOfsuccess = false;
+		try {
+
+			Statement curr = currentCon.createStatement();
+			int result = curr.executeUpdate(friendFinder);
+			if (result > 0)
+				flagOfsuccess = true;
+		} catch (Exception ex) {
+			flagOfsuccess = false;
+		}
+		return flagOfsuccess;
+	}
+
+	public boolean removeFriendRequest(Integer friendId, Integer personId) {
+		// TODO Auto-generated method stub
+		String friendFinder = "DELETE  FROM Friends "
+				+ "WHERE  Friends.person_id = (select per.person_id from Person p " + "join FriendList flist "
+				+ "	       on flist.friendlist_id =  p.friend_list " + "join Friends frnd "
+				+ "			on frnd.friends_id = flist.friends_id 	" + "join Person per  "
+				+ "		on per.person_id=frnd.person_id " + "where  p.person_id=" + personId + "  AND per.person_id = "
+				+ friendId + " );";
+
+		boolean flagOfsuccess = false;
+		try {
+
+			Statement curr = currentCon.createStatement();
+			int result = curr.executeUpdate(friendFinder);
+			if (result > 0)
+				flagOfsuccess = true;
+
+			flagOfsuccess = true;
+		} catch (Exception ex) {
+			flagOfsuccess = false;
+		}
+		return flagOfsuccess;
+
+	}
+
 }
+
 // - See more at:
 // http://www.codemiles.com/jsp-examples/login-using-jsp-servlets-and-database-following-mvc-t10898.html#sthash.erjdhXpE.dpuf

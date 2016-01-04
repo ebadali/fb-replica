@@ -27,6 +27,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import dao.FriendRequestDao;
 import dao.PostDao;
+import dao.UserDAO;
 
 /**
  *
@@ -82,8 +83,8 @@ public class CreatePostServlet extends HttpServlet {
                     pictureFilename = "/a" + (new Random()).nextLong() + picture.getName();
                 }
                 
-                File uploadedFile = new File("docroot/" + pictureFilename);
-                picture.write(uploadedFile);
+//                File uploadedFile = new File("docroot/" + pictureFilename);
+//                picture.write(uploadedFile);
                 
                 String youtubeVideoId = items.get(3).getString();
 	
@@ -102,8 +103,8 @@ public class CreatePostServlet extends HttpServlet {
 		    return;
 		}
             
-
-            if(postDao.createPost(title, text, personId, ownerId, pictureFilename, youtubeVideoId, link)) {
+//		postDao.createPost(title, text, personId, ownerId, pictureFilename, youtubeVideoId, link)
+            if(UserDAO._instance.CreateAPost(title, text, personId, ownerId, pictureFilename, youtubeVideoId, link)){
                 response.sendRedirect("wall?ownerId=" + ownerId);
                 return;
             } else {

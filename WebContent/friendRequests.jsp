@@ -15,13 +15,13 @@
           <tr>
             <td>
 	      <form action="accept_friend_request">
-                <input type="hidden" name="sourceId" value="${requester.id}" />
+                <input type="hidden" name="friendId" value="${requester.id}" />
                 <input type="submit" value="Confirm" />
 	      </form>
 	    </td>
             <td>
 	      <form action="decline_friend_request">
-                <input type="hidden" name="sourceId" value="${requester.id}" />
+                <input type="hidden" name="friendId" value="${requester.id}" />
 	        <input type="submit" value="Ignore" />
 	      </form>
 	    </td>

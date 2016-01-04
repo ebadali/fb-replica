@@ -11,4 +11,7 @@ public class Data {
 	// Origional Data
 	public static final String TABLE_PERSON = "Person";
 	
+	
+	public static final int  PENDING = 0 , FRIENDS = 1 , REQSENT = 2 , ALL = 3 ;
+	
 }
