@@ -14,14 +14,14 @@ public class ConnectionManager {
 	static final String USER = "username";
 	static final String PASS = "password";
 
-	public static Connection getConnection() {
+	public static Connection getConnection(String path) {
 
 		try {            
+			
             Class.forName("org.sqlite.JDBC");
-            String dbURL = "jdbc:sqlite:D:/J2EE/Facebook-Replica/socialmedia";
+            String dbURL = "jdbc:sqlite:"+path+"db/socialmedia";
 			try {
 
-//	            Connection conn = DriverManager.getConnection(dbURL);
 				con = DriverManager.getConnection(dbURL);
 					
 			}

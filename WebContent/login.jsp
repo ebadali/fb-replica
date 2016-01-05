@@ -49,6 +49,8 @@
         </tbody>
       </table>
     </form>
+<%--     <img alt="" src="${pageContext.request.contextPath}/image/image_1.jpg"> --%>
+    
   </body>
 </html>
 

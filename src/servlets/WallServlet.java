@@ -50,6 +50,7 @@ public class WallServlet extends HttpServlet {
 		Integer personId ;//= (Integer) session.getAttribute("personId");
 		
 		String contextPath = request.getContextPath();
+		UserDAO.getInstace(contextPath);
 		Integer ownerId , postId;
 		if (session != null && session.getAttribute("personId") != null  ) 
 		{

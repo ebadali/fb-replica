@@ -32,12 +32,14 @@ public class UserDAO {
 	List<Post> listOfAllPosts;
 	private Person user;
 
-	public static UserDAO _instance = new UserDAO();
+	public static UserDAO _instance = null;
+	public String localPath;
 
-	public UserDAO() {
+	private UserDAO(String path) {
 		// TODO Auto-generated constructor stub
 		try {
-			currentCon = ConnectionManager.getConnection();
+			localPath = path;
+			currentCon = ConnectionManager.getConnection(path);
 
 			stmt = currentCon.createStatement();
 
@@ -45,6 +47,14 @@ public class UserDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public static UserDAO getInstace(String contextPath) {
+		// TODO Auto-generated method stub
+		if (_instance == null)
+			_instance = new UserDAO(contextPath);
+		return _instance;
+
 	}
 
 	public void CloseAll() {
@@ -530,9 +540,14 @@ public class UserDAO {
 					byte[] imgArr = rs1.getBytes("image");
 					if (imgArr != null) {
 						// Todo: Use Relative path
-						String fileLoc = "D:\\J2EE\\Facebook-Replica\\resources\\image" + "\\" + "image_" + file.getId()
-								+ ".jpg";
-						File imagePath = new File(path + "\\resources\\image\\");
+
+						String fileLoc = localPath + "/image/image_" + file.getId() + ".jpg";
+						// String fileLoc =
+						// "D:\\J2EE\\Facebook-Replica\\resources\\image" + "\\"
+						// + "image_" + file.getId()
+
+						// File imagePath = new File(path +
+						// "\\resources\\image\\");
 						try {
 							FileOutputStream fos = new FileOutputStream(fileLoc);
 							fos.write(imgArr);
@@ -714,7 +729,7 @@ public class UserDAO {
 			while (rsss.next()) {
 				int friendID = rsss.getInt("person_id");
 				int status = rsss.getInt("status");
-				if (status == Filter || Filter == Data.ALL ) {
+				if (status == Filter || Filter == Data.ALL) {
 					Person person = GetPerson(friendID);
 					person.setStatus(status);
 					friendList.add(person);

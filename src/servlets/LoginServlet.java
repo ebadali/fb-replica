@@ -50,6 +50,10 @@ public class LoginServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		ctx = getServletConfig().getServletContext();
+		
+		String contextPath = request.getContextPath();
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+		
 		request.setAttribute("error", "");
 		HttpSession session = request.getSession(false);
 		Integer personId ;//= (Integer) session.getAttribute(Data.COOKIE_USERID);
