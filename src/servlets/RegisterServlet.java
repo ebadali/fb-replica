@@ -53,8 +53,7 @@ public class RegisterServlet extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
-		ServletContext ctx = getServletConfig().getServletContext();
-		PrintWriter out = response.getWriter();
+		
 		HttpSession session = request.getSession(false);
 		
 		if( session != null && session.getAttribute("personId") != null   )
@@ -63,8 +62,15 @@ public class RegisterServlet extends HttpServlet {
 			response.sendRedirect("wall?ownerId=" + sessionId);
 			return;
 		}
+		ServletContext ctx = getServletConfig().getServletContext();
+		PrintWriter out = response.getWriter();
 		try {
+			
 
+			System.out.println(getServletContext().getRealPath(""));
+			System.out.println(getServletContext().getRealPath("/WEB-INF/"));
+			UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+			
 			// Create a factory for disk-based file items
 			FileItemFactory factory = new DiskFileItemFactory();
 			ServletFileUpload upload = new ServletFileUpload(factory);
@@ -78,6 +84,7 @@ public class RegisterServlet extends HttpServlet {
 			String monthOfBirth = items.get(i++).getString();
 			String yearOfBirth = items.get(i++).getString();
 			String email = items.get(i++).getString();
+			String password = items.get(i++).getString();
 			String place = items.get(i++).getString();
 			String website = items.get(i++).getString();
 			String education = items.get(i++).getString();
@@ -90,15 +97,19 @@ public class RegisterServlet extends HttpServlet {
 
 			String pictureFilename = null;
 			if (!picture.getName().equals("")) {
-				pictureFilename = "/a" + (new Random()).nextLong() + picture.getName();
+				pictureFilename = picture.getName();	
+				System.out.println(pictureFilename);
+				File uploadedFile = new File(UserDAO._instance.localPath+"image/" + pictureFilename);
+				System.out.println(uploadedFile.getName() +"  ,   "+uploadedFile.getAbsolutePath());
+				picture.write(uploadedFile);
+				pictureFilename = uploadedFile.getAbsolutePath();
 			}
 
-//			File uploadedFile = new File("docroot/" + pictureFilename);
-//			picture.write(uploadedFile);
+			
 
 			boolean success = UserDAO._instance.SignUp(firstName, lastName,
-					Date.valueOf(yearOfBirth + "-" + monthOfBirth + "-" + dayOfBirth), sex, email, place, website,
-					occupation, employment, education, pictureFilename);
+					Date.valueOf(yearOfBirth + "-" + monthOfBirth + "-" + dayOfBirth), sex, email, password, place, website,
+					occupation, employment, education, pictureFilename );
 			if (success) {
 				out.println("We emailed you a confirmation link");
 				return;

@@ -56,7 +56,9 @@ public class FriendServlet extends HttpServlet {
 			return;
 
 		}
-
+	
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+		
 		personId = (Integer) (session.getAttribute("personId"));
 		PrintWriter out = response.getWriter();
 		try {
@@ -65,14 +67,10 @@ public class FriendServlet extends HttpServlet {
 			String orderParam = request.getParameter("order");
 			boolean order = (orderParam == null || !orderParam.equals("DESC"));
 			String orderBy = request.getParameter("orderBy");
-			// if (orderBy != null && orderBy.equals("place")) {
-			// friends = personDao.friendsSortedByPlace(personId, order);
-			// } else if (orderBy != null && orderBy.equals("dateOfBirth")) {
-			// friends = personDao.friendsSortedByDateOfBirth(personId, order);
-			// } else {
-			// friends = personDao.friendsSortedByName(personId, order);
-			// }
-			friends = UserDAO._instance.GetFriends(personId, Data.FRIENDS);
+			int userId = personId;
+			if(request.getParameter("ownerId") != null)
+				userId =Integer.parseInt( request.getParameter("ownerId"));
+			friends = UserDAO._instance.GetFriends(userId, Data.FRIENDS);
 			// List<Person> nonFriends = personDao.nonFriendsFor(personId);
 			// request.setAttribute("friends", friends);
 			// request.setAttribute("nonFriends", nonFriends);

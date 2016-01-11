@@ -1,4 +1,6 @@
 
+<%@page import="entity.Person"%>
+<%@page import="dao.UserDAO"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -20,7 +22,6 @@
 	<a href="wall?ownerId=${wallOwnerId}&filter=popular">Popular</a>
 	<br />
 	<br />
-	<a href="addPost.jsp?ownerId=${wallOwnerId}">Post on this wall</a>
 	<br />
 	<br />
 
@@ -28,39 +29,59 @@
 
 	<%
 		try {
+			String altPath = UserDAO._instance.localPath+"image\not_found.gif";
 			List<Post> listOfPost = (ArrayList<Post>) request.getAttribute("posts");//.getAttribute("posts");
+			String video = "";
 			for (Post post : listOfPost) {
 				out.print("<tr>");
 				out.print("		<td>");
-
+				
+				Person person  = post.getPerson();
+				
+				if(person != null){
+					System.out.println("Person");
+					
+					out.print("<a href='profile?ownerId="+person.getId()+"'><img src=" + person.getPicture() + "  width='50' height='50' alt="+altPath+" />    "
+							+person.getFirstName()+" " + person.getLastName()+"  </a>");
+					//out.print("  <a href=''>"+person.getFirstName()+" " + person.getLastName()+"</a>");
+				}
 				CFile file = post.getFile();
 				int likes = post.getLikers().size();
 				if (file != null) {
 					out.print("<h3>" + file.getTitle() + "</h3>");
 					out.print("<h3>" + file.getText() + "</h3>");
 					if (file.getImage() != null && file.getImage() != "")
-						out.print("<a href=''><img src=" + file.getImage() + " width='200' height='200' /></a>");
-					if (file.getVideos() != null && file.getVideos() != "")
+						
+						out.print("<a href=''><img src=" + file.getImage() + " width='200' height='200' alt="+altPath+" /></a>");
+					if (file.getVideos() != null && file.getVideos() != ""){
+						video = file.getVideos();
+						if(video.contains("watch?v="))
+						{
+							video = file.getVideos().replace("watch?v=", "v/");
+						}
 						out.print("<iframe title='YouTube video player' class='youtube-player'"
 								+ "type='text/html' width='640' height='390' src='"
-								+ file.getVideos().replace("watch?v=", "v/")
+								+ video
 								+ "' frameborder='0' allowFullScreen></iframe>");
 							//out.print("<a href=''><img src="+post.getVideos()+" width='200' height='200' /></a>");
-
+					}
 					//out.print("<a href='?vid=" + i + "&title=" + t + "' >" + t + "</a> ");
 				}
 				
 				out.println("<p>");
-				out.println("<i><a href='comments?postId=" + post.getId() + "'>View/Add Comments</a></i>");
+				
 				out.println("</p> <br />");
 
 				out.println("<p>");
-				out.println("<i><a href='wall?postId="+String.valueOf(post.getId())+"'  id='myLikes' onclick='MyFunction("+String.valueOf(post.getId())+");'>Like</a></i>");
-										
-				out.println(likes + " Likes ");
+				out.println("<a href='wall?postId="+String.valueOf(post.getId())+"&ownerId="+post.getOwnerId()+"&share=false'  id='myLikes' onclick='MyFunction("+String.valueOf(post.getId())+");'>Like</a>");										
+				out.println(likes );
+				out.println("   <a href='wall?postId="+String.valueOf(post.getId())+"&ownerId="+post.getOwnerId()+"&share=true'  id='myLikes' >Share</a>");										
+				
 				out.println("</p> <br />");
-
+				out.println("<a>-----------------------------------------------------------------</a>");
 				out.println("		</td>");
+
+				out.println("<br />");
 				out.println("</tr>");
 				%>
 				<script language="javascript">

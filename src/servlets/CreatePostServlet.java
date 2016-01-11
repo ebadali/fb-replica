@@ -53,13 +53,14 @@ public class CreatePostServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession(true);
-        Integer personId = (Integer)session.getAttribute("personId");
+        Integer personId ;
         ServletContext ctx = getServletConfig().getServletContext();
-        if(personId == null) {
+        if(session  == null && session.getAttribute("personId") == null) {
             response.sendRedirect("login");
             return;
         }
-        
+        personId = (Integer)session.getAttribute("personId");
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
         
         PrintWriter out = response.getWriter();
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -80,32 +81,30 @@ public class CreatePostServlet extends HttpServlet {
                 
                 String pictureFilename = null;
                 if(!picture.getName().equals("")) {
-                    pictureFilename = "/a" + (new Random()).nextLong() + picture.getName();
+                      pictureFilename = UserDAO._instance.localPath +"image/" +picture.getName();
+	                  File uploadedFile = new File(pictureFilename);
+	                  picture.write(uploadedFile);
                 }
                 
-//                File uploadedFile = new File("docroot/" + pictureFilename);
-//                picture.write(uploadedFile);
+
                 
                 String youtubeVideoId = items.get(3).getString();
 	
                 String link = items.get(4).getString();
                 
                 Integer ownerId = null;
-                if (items.get(5).getString() != null && !items.get(5).getString().equals("null")) {
-                    ownerId = Integer.parseInt(items.get(5).getString());
-                } else {
-                    ownerId = personId;
-                }
-                
+//                if (items.get(5).getString() != null && !items.get(5).getString().equals("null")) {
+//                    ownerId = Integer.parseInt(items.get(5).getString());
+//                } else {
+//                    ownerId = personId;
+//                }
+//                
             //}
-		if(!personId.equals(ownerId) && !friendRequestDao.areFriends(personId, ownerId)) {
-		    out.println("You do not have permission to post here");
-		    return;
-		}
+		
             
 //		postDao.createPost(title, text, personId, ownerId, pictureFilename, youtubeVideoId, link)
-            if(UserDAO._instance.CreateAPost(title, text, personId, ownerId, pictureFilename, youtubeVideoId, link)){
-                response.sendRedirect("wall?ownerId=" + ownerId);
+            if(UserDAO._instance.CreateAPost(title, text, personId, personId, pictureFilename, youtubeVideoId, link)){
+                response.sendRedirect("wall?ownerId=" + personId);
                 return;
             } else {
                 out.println("failure");

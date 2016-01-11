@@ -45,35 +45,51 @@ public class WallServlet extends HttpServlet {
 	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
-		HttpSession session = request.getSession(false);
+
 		ServletContext ctx = getServletConfig().getServletContext();
-		Integer personId ;//= (Integer) session.getAttribute("personId");
-		
-		String contextPath = request.getContextPath();
-		UserDAO.getInstace(contextPath);
-		Integer ownerId , postId;
-		if (session != null && session.getAttribute("personId") != null  ) 
-		{
-			ownerId = (Integer) session.getAttribute("personId");
-
-			List<Post> posts = null;
-			if (request.getParameter("postId") != null) {
-				postId = Integer.parseInt(request.getParameter("postId").trim());
-				posts = UserDAO._instance.addALike(postId, ownerId);
-			} else if (request.getParameter("filter") != null && request.getParameter("filter").equals("popular")) {
-				posts = UserDAO._instance.findAllPost(contextPath);// postDao.topTenFor(ownerId);
-			} else {
-				posts = UserDAO._instance.findAllPost(contextPath);// postDao.wallFor(ownerId);
-			}
-			request.setAttribute("posts", posts);
-			// sending this so we can use it in links
-			request.setAttribute("wallOwnerId", ownerId);
-			ctx.getRequestDispatcher("/wallposts.jsp").forward(request, response);
-
-		} else {
+		HttpSession session = request.getSession(false);
+		Integer personId;// = (Integer) session.getAttribute("personId");
+		if (session == null || session.getAttribute("personId") == null) {
 			request.setAttribute("error", "You are Not Logged In");
 			request.getRequestDispatcher("index.jsp").forward(request, response);
+			return;
+
 		}
+		
+		
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+		
+		personId = (Integer) session.getAttribute("personId");
+
+		Integer ownerId = null, postId;
+		boolean shareFlag = false;
+
+		
+		
+		
+		if (request.getParameter("postId") != null && request.getParameter("share") != null ) {
+			//ownerId =  Integer.parseInt(request.getParameter("ownerId").trim());
+			postId = Integer.parseInt(request.getParameter("postId").trim());
+			shareFlag = Boolean.parseBoolean(request.getParameter("share").trim());
+			boolean success = false;
+			if (shareFlag) {
+				success = UserDAO._instance.sharePost(postId, personId);
+			} else {
+				 UserDAO._instance.addALike(postId, personId);
+			}
+
+		} 
+		List<Post> posts = null;
+		if (request.getParameter("filter") != null && request.getParameter("filter").equals("popular")) {
+			posts = UserDAO._instance.PreferentialSearch();// postDao.topTenFor(ownerId);
+		} else {
+			posts = UserDAO._instance.findAllPost();// postDao.wallFor(ownerId);
+		}
+		request.setAttribute("posts", posts);
+		// sending this so we can use it in links
+		request.setAttribute("wallOwnerId", ownerId);  // Not being used so dont worry about context leaking.
+		ctx.getRequestDispatcher("/wallposts.jsp").forward(request, response);
+
 	}
 
 	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on

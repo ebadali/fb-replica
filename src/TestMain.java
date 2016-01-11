@@ -28,6 +28,7 @@ public class TestMain extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		 response.getWriter().println("Hello friend!");
+		 response.sendRedirect("unknowplace?ownerId=");
 //		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 

@@ -11,6 +11,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -30,7 +32,7 @@ public class UserDAO {
 	Statement stmt = null;
 
 	List<Post> listOfAllPosts;
-	private Person user;
+	public Person user;
 
 	public static UserDAO _instance = null;
 	public String localPath;
@@ -56,6 +58,7 @@ public class UserDAO {
 		return _instance;
 
 	}
+	// 104.155.16.11:8080/facebook-replica/wall
 
 	public void CloseAll() {
 		if (rs != null) {
@@ -85,8 +88,9 @@ public class UserDAO {
 
 	}
 
-	public boolean SignUp(String firstName, String lastName, Date dateOfBirth, boolean sex, String email, String place,
-			String website, String education, String occupation, String employment, String picture) {
+	public boolean SignUp(String firstName, String lastName, Date dateOfBirth, boolean sex, String email,
+			String password, String place, String website, String education, String occupation, String employment,
+			String picture) {
 		// extra query + race condition but coulnd't catch the exception being
 		// thrown
 		boolean succesFlag = false;
@@ -120,7 +124,7 @@ public class UserDAO {
 					pstmt.setString(i++, lastName);
 					pstmt.setInt(i++, sex ? 1 : 0);
 					pstmt.setString(i++, email);
-					pstmt.setString(i++, "password"); // password
+					pstmt.setString(i++, password); // password
 					pstmt.setString(i++, dateOfBirth.toString());
 					pstmt.setString(i++, place);
 					pstmt.setString(i++, website);
@@ -154,7 +158,7 @@ public class UserDAO {
 							person.setOccupation(occupation);
 							person.setEmployment(employment);
 							person.setPicture(picture);
-							person.setPassword("password");
+							person.setPassword(password);
 							person.setFriendListId(FriendList_id);
 
 							this.user = person;
@@ -255,17 +259,18 @@ public class UserDAO {
 
 		// preparing some objects for connection
 		boolean success = false;
-		if (this.user != null) {
+		if (this.currentCon == null) {
 			// Already Login.
-			return this.user;
+			UserDAO.getInstace(localPath);
+			this.currentCon = UserDAO._instance.currentCon;
 		}
 
 		String searchQuery = "select * from Person where email='" + email + "' AND password='" + password + "'";
 
 		try {
 
-			rs = stmt.executeQuery(searchQuery);
-			boolean more = rs.next();
+			ResultSet rss = currentCon.createStatement().executeQuery(searchQuery);
+			boolean more = rss.next();
 			// if user does not exist set the isValid variable to false
 			if (!more) {
 				System.out.println("Sorry, you are not a registered user! Please sign up first");
@@ -278,27 +283,27 @@ public class UserDAO {
 				// Create a Person Here.
 
 				this.user = new Person();
-				this.user.setId(rs.getInt("person_id"));
-				this.user.setFirstName(rs.getString("firstname"));
-				this.user.setLastName(rs.getString("lastname"));
-				this.user.setDateOfBirth(rs.getString("dob"));
-				this.user.setSex(rs.getInt("sex") == 1 ? true : false);
-				this.user.setEmail(rs.getString("email"));
-				this.user.setPlace(rs.getString("place"));
-				this.user.setWebsite(rs.getString("website"));
-				this.user.setEducation(rs.getString("education"));
-				this.user.setOccupation(rs.getString("occupation"));
-				this.user.setEmployment(rs.getString("employment"));
-				this.user.setPicture(rs.getString("photo"));
-				this.user.setPassword(rs.getString("password"));
-				this.user.setFriendListId(rs.getInt("friend_list"));
+				this.user.setId(rss.getInt("person_id"));
+				this.user.setFirstName(rss.getString("firstname"));
+				this.user.setLastName(rss.getString("lastname"));
+				this.user.setDateOfBirth(rss.getString("dob"));
+				this.user.setSex(rss.getInt("sex") == 1 ? true : false);
+				this.user.setEmail(rss.getString("email"));
+				this.user.setPlace(rss.getString("place"));
+				this.user.setWebsite(rss.getString("website"));
+				this.user.setEducation(rss.getString("education"));
+				this.user.setOccupation(rss.getString("occupation"));
+				this.user.setEmployment(rss.getString("employment"));
+				this.user.setPicture(rss.getString("photo"));
+				this.user.setPassword(rss.getString("password"));
+				this.user.setFriendListId(rss.getInt("friend_list"));
 
 				success = true;
 			}
 		}
 
 		catch (Exception ex) {
-
+			ex.printStackTrace();
 			System.out.println("Log In failed: An Exception has occurred! " + ex);
 			success = false;
 		}
@@ -379,24 +384,6 @@ public class UserDAO {
 				// person.setSex( rs.getString("gender") );
 				personArray.add(person);
 			}
-			// boolean more = rs.next();
-			// // if user does not exist set the isValid variable to false
-			// if (!more) {
-			// System.out.println("Sorry, you are not a registered user! Please
-			// Sign up first");
-			// return personArray;
-			// } else {
-			//
-			// while (rs.next()) {
-			// Person person = new Person();
-			// person.setFirstName(rs.getString("name"));
-			// person.setEmail(rs.getString("email"));
-			// System.out.println(person.getFirstName()+ " ,
-			// "+person.getEmail());
-			// // person.setSex( rs.getString("gender") );
-			// personArray.add(person);
-			// }
-			// }
 
 		} catch (Exception e) {
 			// handle exception here
@@ -419,22 +406,6 @@ public class UserDAO {
 				// person.setSex( rs.getString("gender") );
 				personArray.add(person);
 			}
-			// boolean more = rs.next();
-			// // if user does not exist set the isValid variable to false
-			// if (!more) {
-			// System.out.println("Sorry, you are not a registered user! Please
-			// sign up first");
-			// return personArray;
-			// } else {
-			// Person person = new Person();
-			// while (rs.next()) {
-			// person.setFirstName(rs.getString("name"));
-			// person.setEmail(rs.getString("email"));
-			//
-			// // person.setSex( rs.getString("gender") );
-			// personArray.add(person);
-			// }
-			// }
 
 		} catch (Exception e) {
 			// handle exception here
@@ -477,12 +448,13 @@ public class UserDAO {
 
 			List<Person> friendList = GetFriends(personId, Data.ALL);
 			// Cross checking and marking the friends in personArray
+
 			if (friendList != null && personArray != null && personArray.size() > 0) {
 				for (int i = 0; i < friendList.size(); i++) {
 					Person temp = friendList.get(i);
 					for (int j = 0; j < personArray.size(); j++) {
 						if (temp.getId().intValue() == personArray.get(j).getId().intValue())
-							personArray.get(j).setStatus(Data.FRIENDS);
+							personArray.get(j).setStatus(temp.getStatus());
 					}
 
 				}
@@ -496,7 +468,7 @@ public class UserDAO {
 		return personArray;
 	}
 
-	public List<Post> findAllPost(String path) {
+	public List<Post> findAllPost() {
 
 		List<Post> postArray = new ArrayList<Post>();
 		try {
@@ -504,23 +476,26 @@ public class UserDAO {
 			// rs = stmt.executeQuery("select * from Person");
 
 			String searchQuery = "select * from Post";
-			stmt = currentCon.createStatement();
-			rs = stmt.executeQuery(searchQuery);
+			
+			rs = currentCon.createStatement().executeQuery(searchQuery);
 			// 1: Get All Post
 			while (rs.next()) {
 				Post post = new Post();
 				post.setId(rs.getInt("post_id"));
+
 				int PersonId = (rs.getInt("person_id"));
 				int FileId = (rs.getInt("file_id"));
 				int LikesId = (rs.getInt("likes_id"));
 
+				post.setPerson_id(PersonId);
+
 				// 2: Get Likers ID and count them.
-				Statement statement1 = currentCon.createStatement();
-				ResultSet rs2 = statement1.executeQuery("select Liker.person_id from Likes " + "join Liker "
+				ResultSet rs2 = currentCon.createStatement().executeQuery("select Liker.person_id from Likes " + "join Liker "
 						+ "on Likes.liker_id = Liker.liker_id " + "  where Likes.likes_id = " + LikesId);
 				List<Integer> Likers = new ArrayList<>();
 				while (rs2.next()) {
-					Likers.add(rs2.getInt("person_id"));
+					if (rs2.getInt("person_id") != 0)
+						Likers.add(rs2.getInt("person_id"));
 				}
 
 				post.setLikers(Likers);
@@ -535,36 +510,41 @@ public class UserDAO {
 
 					file.setVideos(rs1.getString("video"));
 					file.setText(rs1.getString("text"));
+					file.setVideos(rs1.getString("image"));
 
 					// Loading Image if theres any.
-					byte[] imgArr = rs1.getBytes("image");
-					if (imgArr != null) {
-						// Todo: Use Relative path
-
-						String fileLoc = localPath + "/image/image_" + file.getId() + ".jpg";
-						// String fileLoc =
-						// "D:\\J2EE\\Facebook-Replica\\resources\\image" + "\\"
-						// + "image_" + file.getId()
-
-						// File imagePath = new File(path +
-						// "\\resources\\image\\");
-						try {
-							FileOutputStream fos = new FileOutputStream(fileLoc);
-							fos.write(imgArr);
-							String ppath = fos.getFD().toString();
-
-							fos.close();
-
-							file.setImage(fileLoc);
-
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
+					// byte[] imgArr = rs1.getBytes("image");
+					// if (imgArr != null) {
+					// // Todo: Use Relative path
+					//
+					// String fileLoc = localPath + "/image/image_" +
+					// file.getId() + ".jpg";
+					// // String fileLoc =
+					// // "D:\\J2EE\\Facebook-Replica\\resources\\image" + "\\"
+					// // + "image_" + file.getId()
+					//
+					// // File imagePath = new File(path +
+					// // "\\resources\\image\\");
+					// try {
+					// FileOutputStream fos = new FileOutputStream(fileLoc);
+					// fos.write(imgArr);
+					// String ppath = fos.getFD().toString();
+					//
+					// fos.close();
+					//
+					// file.setImage(fileLoc);
+					//
+					// } catch (Exception e) {
+					// e.printStackTrace();
+					// }
+					// }
 					file.setFormattedDate(new Data().toString());
-					file.setTitle("some title");
+					file.setTitle(post.getText());
 
 					post.setFile(file);
+					
+					
+					post.setPerson(GetPerson(PersonId));
 				}
 
 				// 4: Get the Person who posted this.
@@ -581,41 +561,79 @@ public class UserDAO {
 		return postArray;
 	}
 
-	public List<Post> addALike(Integer postId, Integer ownerId) {
-		// TODO Auto-generated method stub
-		if (this.listOfAllPosts == null)
-			return null;
+	public List<Post> PreferentialSearch() {
 
-		// Todo : when session is maintained.
-		ownerId = 9;
-		int l = this.listOfAllPosts.size();
-		for (int i = 0; i < l; i++) {
-			if (postId.intValue() == this.listOfAllPosts.get(i).getId().intValue()
-					&& !this.listOfAllPosts.get(i).getLikers().contains(ownerId)) {
-
-				String insertQuery = " INSERT INTO Liker( liker_id, person_id) " + " select lk.liker_id, " + ownerId
-						+ " as person_id from Post p " + " join Likes l " + " on p.likes_id = l.likes_id "
-						+ " join Liker lk " + " on l.liker_id=lk.liker_id " + " where p.post_id=" + postId
-						+ " group by lk.liker_id";
-
-				try {
-					stmt = currentCon.createStatement();
-					int indexNum = stmt.executeUpdate(insertQuery);
-					System.out.println(indexNum + " --- - ");
-					if (indexNum > 0)
-						this.listOfAllPosts.get(i).getLikers().add(ownerId);
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				break;
-
-			}
+		List<Post> list = findAllPost();
+		if (list != null) {
+			Collections.sort(list);
 		}
 
-		return this.listOfAllPosts;
+		// int index[] = new int[list.size()];
+		// if(list != null)
+		// {
+		// int l = list.size();
+		// int maxLike = 0;
+		// int changeIndex = 0;
+		// for (int i = 0; i < l ; i++) {
+		// maxLike = list.get(i).getMaxLikes();
+		// changeIndex = i;
+		// for(int j= i+1 ; j < l ; j++)
+		// {
+		// if(list.get(j).getMaxLikes() > maxLike)
+		// {
+		// maxLike = list.get(j).getMaxLikes();
+		// changeIndex = j;
+		// }
+		//
+		// }
+		//
+		// // Lets swap here.
+		// index[i] = maxLike;
+		// }
+		// }
+
+		return list;
+
+	}
+
+	public boolean addALike(Integer postId, Integer ownerId) {
+		// TODO Auto-generated method stub
+
+		boolean flag = false;
+		// Todo : when session is maintained.
+
+		// 1. Get PostID and Flag only.
+		// 2. Search in the local list where postid = postID
+		// 3.
+		// String searchQuery = "SELECT person_id FROM Post " + " where
+		// Post.post_id = " + postId
+		// + " ORDER BY Post.post_id ASC LIMIT 1 ";
+
+		try {
+
+			// ResultSet rss =
+			// currentCon.createStatement().executeQuery(searchQuery);
+			//
+			// if (rss.next()) {
+			// int personOwnerId = rss.getInt("person_id");
+
+			String insertQuery = " INSERT INTO Liker( liker_id, person_id) " + " select lk.liker_id, " + ownerId
+					+ " as person_id from Post p " + " join Likes l " + " on p.likes_id = l.likes_id "
+					+ " join Liker lk " + " on l.liker_id=lk.liker_id " + " where p.post_id=" + postId
+					+ " group by lk.liker_id";
+
+			int indexNum = currentCon.createStatement().executeUpdate(insertQuery);
+			System.out.println(indexNum + " --- - ");
+			if (indexNum > 0)
+				flag = true;
+			// }
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			// e1.printStackTrace();
+			flag = false;
+		}
+
+		return flag;
 
 	}
 
@@ -673,6 +691,7 @@ public class UserDAO {
 									post.setId(rs2.getInt("post_id"));
 
 									post.setLikes(likes_id);
+									post.setPerson_id(personId);
 									post.setPerson(this.user);
 									CFile file = new CFile();
 									file.setId(file_Id);
@@ -748,29 +767,53 @@ public class UserDAO {
 		// TODO Auto-generated method stub
 
 		boolean flagOfsuccess = false;
-		String selectSpecificPeople = " select   fList.friends_id " + "	from Person p " + " join FriendList fList "
-				+ " on fList.friendlist_id =  p.friend_list " + " where p.person_id = " + friendId;
+
 		try {
-
-			Statement curr = currentCon.createStatement();
-			ResultSet result = curr.executeQuery(selectSpecificPeople);
-			if (result.next()) {
-				int friendlist = result.getInt("friends_id");
-				String insertTheFriendRequest = " insert into Friends ( friends_id , status , person_id )  values ( "
-						+ friendlist + " , " + Data.PENDING + " , " + personId + " ) ";
-
-				int as = currentCon.createStatement().executeUpdate(insertTheFriendRequest);
-				if (as > 0)
-					flagOfsuccess = true;
-
+			String strr = "select  * from Friends where Friends.person_id = " + personId;
+			ResultSet sett = currentCon.createStatement().executeQuery(strr);
+			System.out.println("friends_id, person_id, status");
+			while (sett.next()) {
+				System.out.println(sett.getString("friends_id") + " , " + sett.getString("person_id") + " , "
+						+ sett.getString("status"));
 			}
 
+			// Statement curr = currentCon.createStatement();
+			// ResultSet result = curr.executeQuery(selectSpecificPeople);
+			// if (result.next()) {
+			// int friendlist = result.getInt("friends_id");
+			// String insertTheFriendRequest = " insert into Friends (
+			// friends_id , status , person_id ) values ( "
+			// + friendlist + " , " + Data.PENDING + " , " + personId + " ) ";
+
+			String insertTheFriendRequest = " replace   into Friends ( friends_id , status , person_id )  values ( "
+					+ "		 (select   fList.friends_id 	from Person p " + "			 join FriendList fList  "
+					+ "			 on fList.friendlist_id =  p.friend_list " + "			  where p.person_id = "
+					+ friendId + " ), " + "		 " + Data.PENDING + " , " + "		 " + personId + " ) ;";
+			int as = currentCon.createStatement().executeUpdate(insertTheFriendRequest);
+			if (as > 0) {
+				flagOfsuccess = true;
+
+				// Just a test
+				String str = "select  * from Friends where Friends.person_id = " + personId;
+				ResultSet set = currentCon.createStatement().executeQuery(str);
+				System.out.println("friends_id, person_id, status");
+				while (set.next()) {
+					System.out.println(set.getString("friends_id") + " , " + set.getString("person_id") + " , "
+							+ set.getString("status"));
+				}
+			}
+
+			// }
+
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			flagOfsuccess = false;
 		}
 		return flagOfsuccess;
 	}
 
+	// select fList.friends_id from Person p join FriendList fList on
+	// fList.friendlist_id = p.friend_list where p.person_id = 1
 	public boolean acceptFriendRequest(Integer friendId, Integer personId) {
 		// TODO Auto-generated method stub
 
@@ -817,6 +860,27 @@ public class UserDAO {
 		}
 		return flagOfsuccess;
 
+	}
+
+	// when current user share some one post.
+	public boolean sharePost(Integer postId, Integer personId) {
+		// TODO Auto-generated method stub.
+		boolean flag = false;
+		if (this.listOfAllPosts != null) {
+			for (Post p : this.listOfAllPosts) {
+				CFile file = p.getFile();
+				if (p.getId().intValue() == postId.intValue() && file != null) {
+					if (CreateAPost(file.getTitle(), file.getText(), personId, null, file.getImage(), file.getVideos(),
+							file.getText())) {
+						flag = true;
+					}
+					break;
+				}
+
+			}
+		}
+
+		return flag;
 	}
 
 }

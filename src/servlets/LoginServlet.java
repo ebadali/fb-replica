@@ -51,10 +51,11 @@ public class LoginServlet extends HttpServlet {
 
 		ctx = getServletConfig().getServletContext();
 		
-		String contextPath = request.getContextPath();
-		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
 		
-		request.setAttribute("error", "");
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+//		System.out.println("error -- "+UserDAO._instance.localPath);
+		
+		//request.setAttribute("error", "");
 		HttpSession session = request.getSession(false);
 		Integer personId ;//= (Integer) session.getAttribute(Data.COOKIE_USERID);
 		String email = request.getParameter(Data.email), password = request.getParameter(Data.password);
@@ -69,7 +70,10 @@ public class LoginServlet extends HttpServlet {
 		} 
 		else if ( session.getAttribute(Data.COOKIE_USERID) == null 
 				&& email != null && password != null) {
+			
+			
 
+			
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter out = response.getWriter();
 			try {
@@ -114,7 +118,6 @@ public class LoginServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		System.out.println("---------------Do Get Called");
 
 		processRequest(request, response);
 	}
@@ -135,7 +138,6 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		System.out.println("---------------Do Post Called");
 		processRequest(request, response);
 	}
 

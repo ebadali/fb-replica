@@ -45,7 +45,8 @@ public class AcceptFriendRequestServlet extends HttpServlet {
 			return;
 
 		}
-        
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+		
         PrintWriter out = response.getWriter();
         try {
         	personId = (Integer)session.getAttribute("personId");

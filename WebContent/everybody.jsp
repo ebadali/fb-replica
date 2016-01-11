@@ -10,14 +10,7 @@
 <body>
 	<jsp:include page="header.jsp" />
 	<h2>Everybody</h2>
-	Sort by:
-	<br /> Name
-	<a href="all_people?order=ASC&orderBy=name">ASC</a>
-	<a href="all_people?order=DESC&orderBy=name">DESC</a> | Birth Date
-	<a href="all_people?order=ASC&orderBy=dateOfBirth">ASC</a>
-	<a href="all_people?order=DESC&orderBy=dateOfBirth">DESC</a> | Place
-	<a href="all_people?order=ASC&orderBy=place">ASC</a>
-	<a href="all_people?order=DESC&orderBy=place">DESC</a>
+	
 	<br />
 	<br />
 
@@ -29,18 +22,20 @@
 			for (Person person : listOfPost) {
 				out.print("<tr>");
 				out.print("<td>");
+				
 				out.print("<a href='profile?personId=" + person.getId()
-						+ "' ><img src=http://lorempixel.com/100/100/people/ width='200' height='200' /></a>");
+						+ "' ><img src='"+person.getPicture()+"' width='128' height='128' /></a>");
 
 				out.print("</td>");
 
 				out.print("<td>");
-				out.print("<a href='profile?personId=" + person.getId() + "' >" + person.getFirstName() + " "
+				out.print("<a href='profile?ownerId=" + person.getId() + "' >" + person.getFirstName() + " "
 						+ person.getLastName() + "</a>");
 				out.print("</td>");
 
 				// their requests are pending.
 				out.print("<td>");
+				System.out.println(person.getId()  +"   ,  "+person.getStatus());
 				if (person.getStatus() == 1) {
 					out.println("<p>Friend</p>");
 				} else if (person.getStatus() == 0) {

@@ -19,9 +19,12 @@ public class ConnectionManager {
 		try {            
 			
             Class.forName("org.sqlite.JDBC");
-            String dbURL = "jdbc:sqlite:"+path+"db/socialmedia";
+            path = path+"db/socialmedia";
+            String newpath = "D:/J2EE/Facebook-Replica/WebContent/socialmedia";
+            String dbURL = "jdbc:sqlite:"+path;
 			try {
-
+				
+//				con =DriverManager.getConnection(ConnectionManager.class.getClassLoader().getResource(dbURL).toString());
 				con = DriverManager.getConnection(dbURL);
 					
 			}
@@ -36,6 +39,11 @@ public class ConnectionManager {
 		}
 
 		return con;
+	}
+
+	public static void CloseConnection()
+	{
+		
 	}
 }
 // - See more at:

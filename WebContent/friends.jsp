@@ -7,17 +7,7 @@
   <body>
     <jsp:include page="header.jsp"/>
     <h2>Friends</h2>
-    Sort by:<br />
-
-    <% if (request.getParameter("personId") == null) { %>
-      Name <a href="friends?order=ASC&orderBy=name">ASC</a> <a href="friends?order=DESC&orderBy=name">DESC</a> |
-      Birth Date <a href="friends?order=ASC&orderBy=dateOfBirth">ASC</a> <a href="friends?order=DESC&orderBy=dateOfBirth">DESC</a> |
-      Place <a href="friends?order=ASC&orderBy=place">ASC</a> <a href="friends?order=DESC&orderBy=place">DESC</a> <br /><br />
-    <% } else { %>
-    Name <a href="friends?order=ASC&orderBy=name&personId=<%= request.getParameter("personId") %>">ASC</a> <a href="friends?order=DESC&orderBy=name&personId=<%= request.getParameter("personId") %>">DESC</a> |
-      Birth Date <a href="friends?order=ASC&orderBy=dateOfBirth&personId=<%= request.getParameter("personId") %>">ASC</a> <a href="friends?order=DESC&orderBy=dateOfBirth&personId=<%= request.getParameter("personId") %>">DESC</a> |
-      Place <a href="friends?order=ASC&orderBy=place&personId=<%= request.getParameter("personId") %>">ASC</a> <a href="friends?order=DESC&orderBy=place&personId=<%= request.getParameter("personId") %>">DESC</a> <br /><br />
-    <% } %>
+    <br />
 
     <table>
     <c:forEach var="person" items="${people}">

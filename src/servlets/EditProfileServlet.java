@@ -46,8 +46,8 @@ public class EditProfileServlet extends HttpServlet {
 		}
 		PrintWriter out = response.getWriter();
 
-		Person person = personDao.findById(personId);
-		request.setAttribute("person", person);
+//		Person person = personDao.findById(personId);
+//		request.setAttribute("person", person);
 		ctx.getRequestDispatcher("/editPersonalInfo.jsp").forward(request, response);
 		return;
 

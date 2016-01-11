@@ -56,6 +56,10 @@
             <td><input type="text" name="email" size="25"></td>
           </tr>
           <tr>
+            <td>Password:</td>
+            <td><input type="text" name="password" size="25"></td>
+          </tr>
+          <tr>
             <td>Place:</td>
             <td><input type="text" name="place" size="25"></td>
           </tr>

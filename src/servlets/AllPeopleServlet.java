@@ -54,6 +54,9 @@ public class AllPeopleServlet extends HttpServlet {
 			return;
 
 		}
+
+		UserDAO.getInstace(getServletContext().getRealPath("/WEB-INF/"));
+		
 		PrintWriter out = response.getWriter();
 		try {
 			personId = (Integer) session.getAttribute("personId");
@@ -66,17 +69,19 @@ public class AllPeopleServlet extends HttpServlet {
 			String orderParam = request.getParameter("order");
 			boolean order = (orderParam == null || !orderParam.equals("DESC"));
 			String orderBy = request.getParameter("orderBy");
-			if (orderBy != null && orderBy.equals("place")) {
-				people = UserDAO._instance.findAllSortedByPlace(order);
-			} else if (orderBy != null && orderBy.equals("dateOfBirth")) {
-				people = UserDAO._instance.findAllSortedByDateOfBirth(order);
-			} else {
-				people = UserDAO._instance.findAllSortedByName(order, personId);
-			}
+			
+//			if (orderBy != null && orderBy.equals("place")) {
+//				people = UserDAO._instance.findAllSortedByPlace(order);
+//			} else if (orderBy != null && orderBy.equals("dateOfBirth")) {
+//				people = UserDAO._instance.findAllSortedByDateOfBirth(order);
+//			} else {
+//				people = UserDAO._instance.findAllSortedByName(order, personId);
+//			}
 
+			people = UserDAO._instance.findAllSortedByName(order, personId);
 			request.setAttribute("people", people);
 			ctx.getRequestDispatcher("/everybody.jsp").forward(request, response);
-			return;
+			
 
 			/*
 			 * TODO output your page here out.println("<html>");

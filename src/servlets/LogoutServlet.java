@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import container.Data;
+import dao.UserDAO;
 
 /**
  *
@@ -41,24 +42,14 @@ public class LogoutServlet extends HttpServlet {
 			return;
 
 		}
+		UserDAO._instance.CloseAll();
+		UserDAO._instance = null;
         session.removeAttribute("personId");
         session.removeAttribute(Data.COOKIE_USERID);
+        session.invalidate();
         response.sendRedirect("login");
-        PrintWriter out = response.getWriter();
-        try {
-            /* TODO output your page here
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet LogoutServlet</title>");  
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet LogoutServlet at " + request.getContextPath () + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-             */
-        } finally {            
-            out.close();
-        }
+        
+      
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

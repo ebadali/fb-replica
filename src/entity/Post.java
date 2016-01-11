@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     //@NamedQuery(name = "Post.findByPosterId", query = "SELECT p FROM Post p WHERE p.posterId = :posterId"),
     @NamedQuery(name = "Post.findByOwnerId", query = "SELECT p FROM Post p WHERE p.ownerId = :ownerId"),
     @NamedQuery(name = "Post.findByPopularity", query = "SELECT p FROM Post p WHERE p.popularity = :popularity")})
-public class Post implements Serializable {
+public class Post implements Serializable, Comparable<Post> {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -245,6 +245,7 @@ public class Post implements Serializable {
 
     @OneToMany (mappedBy="post", cascade=CascadeType.PERSIST)
     private Set<Link> links = new HashSet<Link>();
+	private Integer person_id;
 
     public Set<Link> getLinks() {
 	  return links;
@@ -270,6 +271,37 @@ public class Post implements Serializable {
 
 	public void setFormattedDate(String formattedDate) {
 		this.formattedDate = formattedDate;
+	}
+
+	public void setPerson_id(Integer personId) {
+		// TODO Auto-generated method stub
+		this.person_id = personId;
+		
+	}
+	public int getPerson_id( ) {
+		// TODO Auto-generated method stub
+		return this.person_id ;
+		
+	}
+
+	public int getMaxLikes() {
+		// TODO Auto-generated method stub
+		return this.likers != null ? likers.size() : 0;
+	}
+
+	@Override
+	public int compareTo(Post o) {
+		// TODO Auto-generated method stub
+		if( this.getMaxLikes() > o.getMaxLikes() ) 
+		{
+			return -1;
+		}
+		else if( this.getMaxLikes() < o.getMaxLikes() ) 
+		{
+			return 1;
+		}
+			
+		return 0;
 	}
     
     

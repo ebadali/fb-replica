@@ -5,6 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   </head>
   <script>
+  var ctx = "${pageContext.request.contextPath}";
+  //alert(ctx)
 	function clearForms() {
 		var i;
 		for (i = 0; (i < document.forms.length); i++) {
@@ -49,7 +51,7 @@
         </tbody>
       </table>
     </form>
-<%--     <img alt="" src="${pageContext.request.contextPath}/image/image_1.jpg"> --%>
+<!--       <img src=${pageContext.request.contextPath}+"/WebContent/WEB-INF/image/not_found.gif" />  -->
     
   </body>
 </html>
